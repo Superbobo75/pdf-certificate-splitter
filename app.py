@@ -198,6 +198,7 @@ if uploaded_file:
             folder_name_base = f"rozdelene_{folder_name_base}"
 
         if st.button("Rozdělit PDF a stáhnout ZIP soubor"):
+            progress_bar = st.progress(0)
             output_zip = io.BytesIO()
             with zipfile.ZipFile(output_zip, mode="w") as zf:
                 for i in range(num_pages):
@@ -228,7 +229,11 @@ if uploaded_file:
                     pdf_bytes = single_page_doc.tobytes()
                     single_page_doc.close()
                     zf.writestr(pdf_filename, pdf_bytes)
+                    # === ZDE AKTUALIZUJEME PROGRESS BAR ===
+                    progress = int((i + 1) / num_pages * 100)
+                    progress_bar.progress(progress)
             output_zip.seek(0)
+            progress_bar.empty()
             st.success("Hotovo! ZIP soubor s rozdělenými stránkami je připraven ke stažení.")
             st.download_button(
                 label="Stáhnout ZIP soubor",
